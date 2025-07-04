@@ -1,11 +1,30 @@
-import { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import './App.css';
+import { AuthProvider } from './contexts/AuthContext';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Dashboard from './components/Dashboard';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
-    <>
-      <h1 class='text-3xl font-bold underline'>Hello world!</h1>
-    </>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route path='/dashboard' element={<PrivateRoute />}>
+            <Route index element={<Dashboard />} />
+          </Route>
+          <Route path='/' element={<Navigate to='/login' />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
