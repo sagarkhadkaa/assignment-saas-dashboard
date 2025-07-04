@@ -5,6 +5,8 @@ import { useProjects } from '../hooks/useProjects';
 import ProjectForm from './ProjectForm';
 import ProjectList from './ProjectList';
 import ProjectAnalytics from './ProjectAnalytics';
+import GitHubIntegration from './GitHubIntegration';
+import { addDemoDataToFirestore } from '../utils/demoData';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -54,6 +56,18 @@ export default function Dashboard() {
     await deleteProject(projectId);
   };
 
+  const handleAddDemoData = async () => {
+    try {
+      setFormLoading(true);
+      await addDemoDataToFirestore(addProject);
+      console.log('Demo data added successfully');
+    } catch (error) {
+      console.error('Error adding demo data:', error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Navigation */}
@@ -91,25 +105,47 @@ export default function Dashboard() {
                 Manage your projects and track their progress
               </p>
             </div>
-            <button
-              onClick={handleAddProject}
-              className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-            >
-              <svg
-                className='-ml-1 mr-2 h-5 w-5'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
+            <div className='flex space-x-3'>
+              <button
+                onClick={handleAddDemoData}
+                disabled={formLoading}
+                className='inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50'
               >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M12 6v6m0 0v6m0-6h6m-6 0H6'
-                />
-              </svg>
-              Add Project
-            </button>
+                <svg
+                  className='-ml-1 mr-2 h-4 w-4'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12'
+                  />
+                </svg>
+                Add Demo Data
+              </button>
+              <button
+                onClick={handleAddProject}
+                className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+              >
+                <svg
+                  className='-ml-1 mr-2 h-5 w-5'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+                  />
+                </svg>
+                Add Project
+              </button>
+            </div>
           </div>
         </div>
 
@@ -123,6 +159,11 @@ export default function Dashboard() {
         {/* Analytics Section */}
         <div className='mb-6'>
           <ProjectAnalytics projects={projects} loading={loading} />
+        </div>
+
+        {/* GitHub Integration Section */}
+        <div className='mb-6'>
+          <GitHubIntegration />
         </div>
 
         {/* Project List */}

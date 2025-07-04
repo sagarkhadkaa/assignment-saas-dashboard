@@ -19,6 +19,7 @@ export default function ProjectForm({
     title: project?.title || '',
     description: project?.description || '',
     status: project?.status || 'Planning',
+    githubUrl: project?.githubUrl || '',
   });
 
   const [errors, setErrors] = useState({});
@@ -154,6 +155,32 @@ export default function ProjectForm({
               {errors.status && (
                 <p className='mt-1 text-sm text-red-600'>{errors.status}</p>
               )}
+            </div>
+
+            <div>
+              <label
+                htmlFor='githubUrl'
+                className='block text-sm font-medium text-gray-700'
+              >
+                GitHub Repository URL (Optional)
+              </label>
+              <input
+                type='url'
+                id='githubUrl'
+                name='githubUrl'
+                value={formData.githubUrl}
+                onChange={handleChange}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.githubUrl ? 'border-red-300' : 'border-gray-300'
+                }`}
+                placeholder='https://github.com/username/repository'
+              />
+              {errors.githubUrl && (
+                <p className='mt-1 text-sm text-red-600'>{errors.githubUrl}</p>
+              )}
+              <p className='mt-1 text-sm text-gray-500'>
+                Link this project to a GitHub repository for better integration
+              </p>
             </div>
 
             <div className='flex justify-end space-x-3 pt-4'>
