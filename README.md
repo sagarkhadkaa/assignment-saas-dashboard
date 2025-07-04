@@ -1,6 +1,37 @@
 # SaaS Dashboard with Firebase Authentication
 
-This project is a React SaaS dashboard with Firebase authentication integration. It includes login and signup functionality.
+This project is a comprehensive React SaaS dashboard with Firebase authentication, project management, data visualization, GitHub API integration, and Stripe subscription management.
+
+## System Requirements
+
+### Prerequisites
+
+Before running this project, ensure you have the following installed:
+
+- **Node.js**: `>= 18.0.0` (Recommended: `v18.x` or `v20.x` or `v22.x`)
+  - This project is tested with Node.js `v22.11.0`
+- **npm**: `>= 8.0.0` (comes with Node.js)
+  - This project is tested with npm `v10.9.0`
+- **Git**: Latest version for version control
+
+### Compatible Operating Systems
+
+- macOS 10.15 or later
+- Windows 10 or later
+- Linux (Ubuntu 18.04+, CentOS 7+, or similar)
+
+### Browser Compatibility
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+### External Services Required
+
+- **Firebase Account**: For authentication and Firestore database
+- **GitHub Account**: For API integration (optional, has rate limiting)
+- **Stripe Account**: For payment processing (test mode available)
 
 ## Setup Instructions
 
