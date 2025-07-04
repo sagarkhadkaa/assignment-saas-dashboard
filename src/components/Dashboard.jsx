@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
 import ProjectForm from './ProjectForm';
 import ProjectList from './ProjectList';
+import ProjectAnalytics from './ProjectAnalytics';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -118,6 +119,11 @@ export default function Dashboard() {
             {error}
           </div>
         )}
+
+        {/* Analytics Section */}
+        <div className='mb-6'>
+          <ProjectAnalytics projects={projects} loading={loading} />
+        </div>
 
         {/* Project List */}
         <div className='bg-white shadow rounded-lg p-6'>
