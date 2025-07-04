@@ -34,5 +34,10 @@ dist-ssr
 firebase-debug.log
 .firebase/
 
+# Demo and test files
 FIREBASE_TROUBLESHOOTING.md
+FIRESTORE_DEBUGGING.md
+PROJECT_LIST_TROUBLESHOOTING.md
 test-firebase-auth.js
+DEMO_DATA.md
+setup-check.sh

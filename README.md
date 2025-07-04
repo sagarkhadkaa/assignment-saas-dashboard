@@ -31,10 +31,14 @@ This project is a React SaaS dashboard with Firebase authentication integration.
 4. Register your app and get your Firebase configuration
 5. Copy the configuration values to your `.env` file
 
-### 3. Enable Email/Password Authentication
+### 3. Enable Firebase Services
 
-1. In the Firebase Console, go to "Authentication" > "Sign-in method"
-2. Enable the "Email/Password" sign-in provider
+1. **Authentication**: In the Firebase Console, go to "Authentication" > "Sign-in method" and enable the "Email/Password" sign-in provider
+2. **Firestore Database**:
+   - Go to "Firestore Database" in the Firebase Console
+   - Click "Create database"
+   - Choose "Start in test mode" for development (you can configure security rules later)
+   - Select a location for your database
 
 ### 4. Running the Application
 
@@ -63,14 +67,24 @@ This project is a React SaaS dashboard with Firebase authentication integration.
 - Protected dashboard route (only accessible to authenticated users)
 - Logout functionality
 - Environment variable configuration for security
+- **Project Management CRUD Operations:**
+  - Create new projects with title, description, and status
+  - View all projects in a responsive list
+  - Edit existing projects
+  - Delete projects with confirmation
+  - Real-time data synchronization with Firestore
+  - Projects are user-specific (each user sees only their own projects)
 
 ## Project Structure
 
 - `src/firebase/config.js`: Firebase configuration using environment variables
 - `src/contexts/AuthContext.jsx`: Authentication context provider
+- `src/hooks/useProjects.js`: Custom hook for project CRUD operations
 - `src/components/Login.jsx`: Login component
 - `src/components/Signup.jsx`: Signup component
-- `src/components/Dashboard.jsx`: Dashboard component (protected route)
+- `src/components/Dashboard.jsx`: Main dashboard with project management
+- `src/components/ProjectForm.jsx`: Modal form for creating/editing projects
+- `src/components/ProjectList.jsx`: Component for displaying projects list
 - `src/components/PrivateRoute.jsx`: Route component for protected routes
 
 ## Technologies Used
