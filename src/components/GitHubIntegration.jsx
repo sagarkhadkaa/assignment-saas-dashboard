@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useGitHubData } from '../hooks/useGitHubData';
+import { useSubscription } from '../contexts/SubscriptionContext';
+import FeatureRestriction from './FeatureRestriction';
 
 export default function GitHubIntegration() {
   const {
@@ -14,6 +16,9 @@ export default function GitHubIntegration() {
     getUserProfile,
   } = useGitHubData();
 
+  const { canPerformAction } = useSubscription();
+  const [githubRequestCount, setGithubRequestCount] = useState(0);
+
   const [activeView, setActiveView] = useState('trending');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -25,23 +30,38 @@ export default function GitHubIntegration() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     
+    if (!canPerformAction('githubRequest', githubRequestCount)) {
+      return; // FeatureRestriction will handle the UI
+    }
+    
     const results = await searchRepositories(searchQuery);
     setSearchResults(results);
     setActiveView('search');
+    setGithubRequestCount(prev => prev + 1);
   };
 
   const handleUserSearch = async (e) => {
     e.preventDefault();
     if (!username.trim()) return;
     
+    if (!canPerformAction('githubRequest', githubRequestCount)) {
+      return; // FeatureRestriction will handle the UI
+    }
+    
     const profile = await getUserProfile(username);
     setUserProfile(profile);
     setActiveView('user');
+    setGithubRequestCount(prev => prev + 1);
   };
 
   const handleTimeRangeChange = (newRange) => {
+    if (!canPerformAction('githubRequest', githubRequestCount)) {
+      return; // FeatureRestriction will handle the UI
+    }
+    
     setTimeRange(newRange);
     fetchTrendingRepositories('', newRange);
+    setGithubRequestCount(prev => prev + 1);
   };
 
   const formatNumber = (num) => {
@@ -142,66 +162,79 @@ export default function GitHubIntegration() {
 
         {/* Trending Repositories */}
         {activeView === 'trending' && !loading && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-md font-medium text-gray-900">Trending Repositories</h4>
-              <div className="flex space-x-2">
-                {['daily', 'weekly', 'monthly'].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => handleTimeRangeChange(range)}
-                    className={`px-3 py-1 text-sm rounded ${
-                      timeRange === range
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {range.charAt(0).toUpperCase() + range.slice(1)}
-                  </button>
+          <FeatureRestriction 
+            feature="githubRequest" 
+            currentCount={githubRequestCount}
+            fallback={
+              <div className="text-center py-8">
+                <h4 className="text-lg font-medium text-gray-900 mb-4">GitHub API Limit Reached</h4>
+                <p className="text-gray-600 mb-6">
+                  You've reached your GitHub API request limit for this month.
+                </p>
+              </div>
+            }
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-md font-medium text-gray-900">Trending Repositories</h4>
+                <div className="flex space-x-2">
+                  {['daily', 'weekly', 'monthly'].map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => handleTimeRangeChange(range)}
+                      className={`px-3 py-1 text-sm rounded ${
+                        timeRange === range
+                          ? 'bg-indigo-100 text-indigo-700'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {range.charAt(0).toUpperCase() + range.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                {trendingRepos.slice(0, 5).map((repo) => (
+                  <div key={repo.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h5 className="font-medium text-gray-900">{repo.name}</h5>
+                          {repo.language && (
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
+                              style={{ backgroundColor: getLanguageColor(repo.language) }}
+                            >
+                              {repo.language}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">{repo.description}</p>
+                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                          <span className="flex items-center">
+                            ⭐ {formatNumber(repo.stargazers_count)}
+                          </span>
+                          <span className="flex items-center">
+                            🍴 {formatNumber(repo.forks_count)}
+                          </span>
+                          <span>Updated {formatDate(repo.updated_at)}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={repo.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-4 inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        View
+                      </a>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-
-            <div className="grid gap-4">
-              {trendingRepos.slice(0, 5).map((repo) => (
-                <div key={repo.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <h5 className="font-medium text-gray-900">{repo.name}</h5>
-                        {repo.language && (
-                          <span
-                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium text-white"
-                            style={{ backgroundColor: getLanguageColor(repo.language) }}
-                          >
-                            {repo.language}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{repo.description}</p>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                        <span className="flex items-center">
-                          ⭐ {formatNumber(repo.stargazers_count)}
-                        </span>
-                        <span className="flex items-center">
-                          🍴 {formatNumber(repo.forks_count)}
-                        </span>
-                        <span>Updated {formatDate(repo.updated_at)}</span>
-                      </div>
-                    </div>
-                    <a
-                      href={repo.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-4 inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      View
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          </FeatureRestriction>
         )}
 
         {/* Search Repositories */}
